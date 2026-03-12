@@ -1,0 +1,199 @@
+/* ── Reset & base ────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #0f0f11;
+  --surface:   #1a1a1f;
+  --border:    #2e2e38;
+  --text:      #e8e8f0;
+  --muted:     #7a7a90;
+  --accent:    #7c6af7;
+  --accent-lo: #7c6af720;
+  --met:       #34c98e;
+  --met-lo:    #34c98e22;
+  --unmet:     #f76a6a;
+  --unmet-lo:  #f76a6a22;
+  --radius:    12px;
+  --font:      'DM Sans', system-ui, sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  min-height: 100dvh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+/* ── Layout ──────────────────────────────────────────────────── */
+.app {
+  width: 100%;
+  max-width: 680px;
+  padding: 2rem 1.25rem 4rem;
+}
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.screen--centered {
+  align-items: center;
+  text-align: center;
+  padding-top: 6rem;
+  gap: 1.25rem;
+}
+
+/* ── Header ──────────────────────────────────────────────────── */
+header { display: flex; flex-direction: column; gap: 0.4rem; }
+
+h1 {
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* ── Feelings pill grid ──────────────────────────────────────── */
+.pill-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pill {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 0.45rem 1rem;
+  font-size: 0.88rem;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.pill:hover {
+  border-color: var(--accent);
+  background: var(--accent-lo);
+}
+
+.pill--selected {
+  background: var(--accent-lo);
+  border-color: var(--accent);
+  color: #a89fff;
+}
+
+/* ── Needs grid ──────────────────────────────────────────────── */
+.needs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.6rem;
+}
+
+.need-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  color: var(--text);
+  border-radius: var(--radius);
+  padding: 0.65rem 0.9rem;
+  font-size: 0.9rem;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.need-chip:hover { border-color: var(--muted); }
+
+.need-chip--met {
+  background: var(--met-lo);
+  border-color: var(--met);
+  color: var(--met);
+}
+
+.need-chip--unmet {
+  background: var(--unmet-lo);
+  border-color: var(--unmet);
+  color: var(--unmet);
+}
+
+.need-badge {
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.7rem 1.6rem;
+  font-size: 0.95rem;
+  font-family: var(--font);
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.btn-primary:hover:not(:disabled) { opacity: 0.85; }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.7rem 1.2rem;
+  font-size: 0.95rem;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.btn-ghost:hover:not(:disabled) { border-color: var(--muted); color: var(--text); }
+.btn-ghost:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Done screen ─────────────────────────────────────────────── */
+.done-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--met-lo);
+  border: 2px solid var(--met);
+  color: var(--met);
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Error ───────────────────────────────────────────────────── */
+.error-msg {
+  color: var(--unmet);
+  font-size: 0.88rem;
+  text-align: center;
+}
