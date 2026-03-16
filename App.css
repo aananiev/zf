@@ -22,29 +22,41 @@ body {
   color: var(--text);
   font-family: var(--font);
   min-height: 100dvh;
+  height: 100dvh;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
 }
 
 /* ── Layout ──────────────────────────────────────────────────── */
 .app {
   width: 100%;
   max-width: 680px;
-  padding: 2rem 1.25rem 4rem;
+  height: 100dvh;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
 
 .screen {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
+  flex: 1;
+  justify-content: space-between;
+  overflow: hidden;
 }
 
 .screen--centered {
   align-items: center;
   text-align: center;
-  padding-top: 6rem;
+  padding-top: 0;
   gap: 1.25rem;
+  justify-content: center;
 }
 
 /* ── Header ──────────────────────────────────────────────────── */
@@ -96,8 +108,25 @@ h1 {
 /* ── Needs grid ──────────────────────────────────────────────── */
 .needs-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 0.6rem;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 0.5rem;
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.needs-grid::-webkit-scrollbar {
+  width: 4px;
+}
+
+.needs-grid::-webkit-scrollbar-track {
+  background: var(--surface);
+  border-radius: 2px;
+}
+
+.needs-grid::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
 }
 
 .need-chip {
