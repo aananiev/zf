@@ -23,28 +23,28 @@ body {
   font-family: var(--font);
   min-height: 100dvh;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
 }
 
 /* ── Layout ──────────────────────────────────────────────────── */
 .app {
-  width: 100%;
+  width: 90%;
   max-width: 680px;
-  padding: 2rem 1.25rem 4rem;
+  padding: clamp(1rem, 2vw, 2rem) clamp(0.5rem, 1.5vw, 1.25rem) clamp(2rem, 4vw, 4rem);
 }
 
 .screen {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: clamp(1rem, 2vw, 2rem);
 }
 
 .screen--centered {
   align-items: center;
   text-align: center;
-  padding-top: 6rem;
-  gap: 1.25rem;
+  padding-top: clamp(3rem, 5vw, 6rem);
+  gap: clamp(0.5rem, 1vw, 1.25rem);
 }
 
 /* ── Header ──────────────────────────────────────────────────── */
