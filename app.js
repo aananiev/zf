@@ -1,7 +1,7 @@
 // ─── CONFIG ────────────────────────────────────────────────────────────────
 // Replace these with your values after following SETUP.md
-const APPS_SCRIPT_URL = "YOUR_APPS_SCRIPT_URL_HERE";
-const SHARED_SECRET   = "YOUR_SHARED_SECRET_HERE";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzNqTCwAU0C9LlGEM7C6lvtdM9wuaH5FFSRiNg3hWBaOVkn3llrLsLQ9PXntCfeK0ebWw/exec";
+const SHARED_SECRET   = "himitsudesu";
 
 // ─── DATA ──────────────────────────────────────────────────────────────────
 const FEELINGS = [
