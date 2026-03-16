@@ -90,7 +90,7 @@ function respond(payload) {
 
 ## Step 4 — Configure the App
 
-Open `App.jsx` and replace the two placeholder values near the top of the file:
+Open `app.js` and replace the two placeholder values near the top of the file:
 
 ```js
 const APPS_SCRIPT_URL = "YOUR_APPS_SCRIPT_URL_HERE";  // ← paste the URL from Step 3
@@ -118,6 +118,29 @@ curl -L -X POST "YOUR_APPS_SCRIPT_URL_HERE" \
 Expected response: `{"status":"ok"}`
 
 Check your spreadsheet — a new row should have appeared.
+
+---
+
+## CORS — important note for browser-based requests
+
+Google Apps Script web-app endpoints do **not** handle CORS preflight
+(`OPTIONS`) requests. A preflight is triggered whenever the browser considers
+the request "non-simple" — for example when you set
+`Content-Type: application/json`.
+
+The app avoids this by sending the JSON payload with
+`Content-Type: text/plain` instead. This is a _simple_ content type that
+**does not** trigger a preflight, so the `POST` goes straight through.
+Google Apps Script still receives the raw body in `e.postData.contents` and
+`JSON.parse()` works the same way regardless of the content-type header.
+
+> **Do not** change the `Content-Type` back to `application/json` — doing so
+> will cause a CORS error in the browser even though the same request works
+> fine from `curl` (which doesn't enforce CORS).
+
+Also make sure the deployment access is set to **Anyone** (Step 3-3).
+If it is set to "Only myself" or "Anyone with a Google account", the
+browser will receive a sign-in redirect that also fails CORS.
 
 ---
 
