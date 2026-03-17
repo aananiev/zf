@@ -11,6 +11,40 @@ const FEELINGS = [
   "Disconnected","Irritated","Exhausted","Numb","Embarrassed","Angry","Scared","Disappointed",
 ];
 
+// Fruit emojis for each feeling - using a variety of food/fruit emojis
+const FRUIT_EMOJIS = [
+  "🍎", // apple
+  "🍌", // banana
+  "🍓", // strawberry
+  "🍊", // orange
+  "🍇", // grapes
+  "🍒", // cherries
+  "🍍", // pineapple
+  "🥝", // kiwi
+  "🥭", // mango
+  "🍐", // pear
+  "🍑", // peach
+  "🍈", // melon
+  "🍋", // lemon
+  "🍉", // watermelon
+  "🥥", // coconut
+  "🫐", // blueberries
+  "🍅", // tomato
+  "🥑", // avocado
+  "🍆", // eggplant
+  "🌶️", // hot pepper
+  "🥒", // cucumber
+  "🌽", // corn
+  "🥕", // carrot
+  "🫑", // bell pepper
+  "🧄", // garlic
+  "🧅", // onion
+  "🥔", // potato
+  "🍠", // sweet potato
+  "🍯", // honey
+  "🥐", // croissant (as a treat)
+];
+
 const NEEDS = [
   "Belonging","Autonomy","Safety","Recognition","Rest","Clarity",
   "Connection","Meaning","Play","Fairness","Support","Learning",
@@ -39,6 +73,36 @@ function toggle(set, item) {
   return next;
 }
 
+// Generate CSS for hue-rotated emojis
+function generateFruitCSS() {
+  const style = document.createElement('style');
+  let css = '';
+  
+  FEELINGS.forEach((feeling, index) => {
+    const hue = (index * 30) % 360; // Spread hues evenly
+    const fruitEmoji = FRUIT_EMOJIS[index % FRUIT_EMOJIS.length];
+    
+    css += `
+      .fruit-container[data-feeling="${feeling}"] .fruit-emoji {
+        filter: hue-rotate(${hue}deg);
+      }
+      
+      .fruit-container[data-feeling="${feeling}"]:hover .fruit-emoji,
+      .fruit-container[data-feeling="${feeling}"].selected .fruit-emoji {
+        filter: hue-rotate(${hue}deg) drop-shadow(0 0 8px rgba(255, 255, 0, 0.7));
+      }
+      
+      .fruit-container[data-feeling="${feeling}"].selected {
+        border-color: rgba(255, 255, 0, 0.7);
+        box-shadow: 0 0 0 2px rgba(255, 255, 0, 0.3);
+      }
+    `;
+  });
+  
+  style.textContent = css;
+  document.head.appendChild(style);
+}
+
 function render() {
   if (state.screen === SCREEN.FEELINGS) {
     renderFeelingsScreen();
@@ -50,9 +114,20 @@ function render() {
 }
 
 function renderFeelingsScreen() {
-  const feelingsPillsHtml = FEELINGS.map(f => {
+  // Generate CSS for fruit emojis on first render
+  if (!document.querySelector('style[data-fruit-css]')) {
+    generateFruitCSS();
+  }
+  
+  const feelingsFruitsHtml = FEELINGS.map((f, index) => {
     const selected = state.feelings.has(f);
-    return `<button class="pill ${selected ? 'pill--selected' : ''}" data-feeling="${f}">${f}</button>`;
+    const fruitEmoji = FRUIT_EMOJIS[index % FRUIT_EMOJIS.length];
+    return `
+      <div class="fruit-container ${selected ? 'selected' : ''}" data-feeling="${f}">
+        <div class="fruit-emoji">${fruitEmoji}</div>
+        <div class="fruit-label">${f}</div>
+      </div>
+    `;
   }).join('');
 
   app.innerHTML = `
@@ -61,16 +136,16 @@ function renderFeelingsScreen() {
         <h1>How did this experience feel?</h1>
         <p class="subtitle">Select all that apply</p>
       </header>
-      <div class="pill-grid">${feelingsPillsHtml}</div>
+      <div class="fruit-grid">${feelingsFruitsHtml}</div>
       <footer>
         <button class="btn-primary" id="btn-next" ${state.feelings.size === 0 ? 'disabled' : ''}>Next →</button>
       </footer>
     </div>
   `;
 
-  app.querySelectorAll('.pill').forEach(pill => {
-    pill.addEventListener('click', () => {
-      const feeling = pill.dataset.feeling;
+  app.querySelectorAll('.fruit-container').forEach(container => {
+    container.addEventListener('click', () => {
+      const feeling = container.dataset.feeling;
       state.feelings = toggle(state.feelings, feeling);
       render();
     });

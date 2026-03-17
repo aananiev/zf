@@ -17,6 +17,14 @@
   --font:      'DM Sans', system-ui, sans-serif;
 }
 
+/* ── Fruit-specific variables ─────────────────────────────── */
+:root {
+  --fruit-size: 3.5rem;
+  --fruit-gap: 1rem;
+  --emoji-size: 3rem;
+  --label-size: 1rem;
+}
+
 html, body {
   height: 100%;
   overflow: hidden;
@@ -84,46 +92,68 @@ h1 {
   font-size: 0.9rem;
 }
 
-/* ── Feelings pill grid ──────────────────────────────────────── */
-.screen .pill-grid {
+/* ── Fruit grid ─────────────────────────────────────────────── */
+.fruit-grid {
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  align-content: flex-start;
+  display: grid;
+  gap: var(--fruit-gap);
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  align-content: start;
+  padding: 0.5rem 0;
 }
 
-.pill-grid {
+.fruit-container {
+  position: relative;
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.pill {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: var(--fruit-size);
+  height: var(--fruit-size);
+  border-radius: 50%;
+  border: 2px solid var(--border);
   background: var(--surface);
-  border: 1.5px solid var(--border);
-  color: var(--text);
-  border-radius: 999px;
-  padding: 0.45rem 1rem;
-  font-size: 0.88rem;
-  font-family: var(--font);
+  transition: all 0.2s ease;
   cursor: pointer;
-  transition: all 0.15s ease;
-  white-space: nowrap;
+  overflow: hidden;
+  text-decoration: none;
 }
 
-.pill:hover {
+.fruit-container:hover {
   border-color: var(--accent);
   background: var(--accent-lo);
+  transform: translateY(-2px);
 }
 
-.pill--selected {
-  background: var(--accent-lo);
-  border-color: var(--accent);
-  color: #a89fff;
+.fruit-emoji {
+  font-size: var(--emoji-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: filter 0.2s ease;
+}
+
+.fruit-label {
+  margin-top: 0.5rem;
+  font-size: var(--label-size);
+  font-weight: 500;
+  text-align: center;
+  width: 100%;
+  padding: 0 0.25rem;
+  line-height: 1.2;
+  word-wrap: break-word;
+}
+
+/* Selected states */
+.fruit-container.selected {
+  border-color: rgba(255, 255, 0, 0.7);
+  box-shadow: 0 0 0 3px rgba(255, 255, 0, 0.2);
+  background: rgba(30, 30, 40, 0.8);
+}
+
+.fruit-container.selected .fruit-emoji {
+  filter: drop-shadow(0 0 8px rgba(255, 255, 0, 0.7));
 }
 
 /* ── Needs grid ──────────────────────────────────────────────── */
