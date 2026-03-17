@@ -11,38 +11,38 @@ const FEELINGS = [
   "Disconnected","Irritated","Exhausted","Numb","Embarrassed","Angry","Scared","Disappointed",
 ];
 
-// Fruit emojis for each feeling - using a variety of food/fruit emojis
-const FRUIT_EMOJIS = [
-  "🍎", // apple
-  "🍌", // banana
-  "🍓", // strawberry
-  "🍊", // orange
-  "🍇", // grapes
-  "🍒", // cherries
-  "🍍", // pineapple
-  "🥝", // kiwi
-  "🥭", // mango
-  "🍐", // pear
-  "🍑", // peach
-  "🍈", // melon
-  "🍋", // lemon
-  "🍉", // watermelon
-  "🥥", // coconut
-  "🫐", // blueberries
-  "🍅", // tomato
-  "🥑", // avocado
-  "🍆", // eggplant
-  "🌶️", // hot pepper
-  "🥒", // cucumber
-  "🌽", // corn
-  "🥕", // carrot
-  "🫑", // bell pepper
-  "🧄", // garlic
-  "🧅", // onion
-  "🥔", // potato
-  "🍠", // sweet potato
-  "🍯", // honey
-  "🥐", // croissant (as a treat)
+// CSS fruit class names - each maps to a unique fruit shape
+const FRUIT_CLASSES = [
+  "fruit-apple",      // Joyful
+  "fruit-banana",     // Grateful
+  "fruit-strawberry", // Inspired
+  "fruit-orange",     // Excited
+  "fruit-grapes",     // Peaceful
+  "fruit-cherry",     // Curious
+  "fruit-pineapple",  // Connected
+  "fruit-kiwi",       // Proud
+  "fruit-mango",      // Relieved
+  "fruit-pear",       // Hopeful
+  "fruit-peach",      // Amused
+  "fruit-watermelon", // Content
+  "fruit-lemon",      // Energised
+  "fruit-coconut",    // Moved
+  "fruit-blueberry",  // Safe
+  "fruit-raspberry",  // Anxious
+  "fruit-avocado",    // Overwhelmed
+  "fruit-dragonfruit",// Confused
+  "fruit-pomegranate",// Frustrated
+  "fruit-fig",        // Sad
+  "fruit-papaya",     // Lonely
+  "fruit-passionfruit",// Bored
+  "fruit-cantaloupe", // Disconnected
+  "fruit-honeydew",   // Irritated
+  "fruit-starfruit",  // Exhausted
+  "fruit-persimmon",  // Numb
+  "fruit-plum",       // Embarrassed
+  "fruit-apricot",    // Angry
+  "fruit-nectarine",  // Scared
+  "fruit-cranberry",  // Disappointed
 ];
 
 const NEEDS = [
@@ -60,7 +60,8 @@ let state = {
   feelings: new Set(),
   needStates: {},
   submitting: false,
-  error: null
+  error: null,
+  fruitPositions: [] // Store computed positions for random layout
 };
 
 // ─── DOM ───────────────────────────────────────────────────────────────────
@@ -73,34 +74,66 @@ function toggle(set, item) {
   return next;
 }
 
-// Generate CSS for hue-rotated emojis
-function generateFruitCSS() {
-  const style = document.createElement('style');
-  let css = '';
+// Calculate random non-overlapping positions for fruits
+function calculateFruitPositions(containerWidth, containerHeight, isMobile, isTablet) {
+  const padding = 20; // Space from container edges
+  const fruitWrapperWidth = 75; // Approximate width + margin
+  const fruitWrapperHeight = 85; // Approximate height + margin
   
-  FEELINGS.forEach((feeling, index) => {
-    const hue = (index * 30) % 360; // Spread hues evenly
-    const fruitEmoji = FRUIT_EMOJIS[index % FRUIT_EMOJIS.length];
+  // On mobile: use a nice responsive grid
+  if (isMobile || containerWidth < 500) {
+    return { type: 'grid', positions: null };
+  }
+  
+  // On tablet and desktop: use random positions with collision detection
+  const positions = [];
+  const maxAttempts = 500; // Max attempts to find non-overlapping position
+  const minDistance = 65; // Minimum distance between fruit centers
+  
+  // Generate random positions with collision detection
+  for (let i = 0; i < FEELINGS.length; i++) {
+    let placed = false;
+    let attempts = 0;
     
-    css += `
-      .fruit-container[data-feeling="${feeling}"] .fruit-emoji {
-        filter: hue-rotate(${hue}deg);
+    while (!placed && attempts < maxAttempts) {
+      // Generate random position within container bounds
+      const x = padding + Math.random() * (containerWidth - fruitWrapperWidth - padding * 2);
+      const y = padding + Math.random() * (containerHeight - fruitWrapperHeight - padding * 2);
+      
+      // Check for overlap with existing fruits
+      let overlaps = false;
+      for (const pos of positions) {
+        const dx = x - pos.x;
+        const dy = y - pos.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < minDistance) {
+          overlaps = true;
+          break;
+        }
       }
       
-      .fruit-container[data-feeling="${feeling}"]:hover .fruit-emoji,
-      .fruit-container[data-feeling="${feeling}"].selected .fruit-emoji {
-        filter: hue-rotate(${hue}deg) drop-shadow(0 0 8px rgba(255, 255, 0, 0.7));
+      if (!overlaps) {
+        positions.push({ x, y });
+        placed = true;
       }
       
-      .fruit-container[data-feeling="${feeling}"].selected {
-        border-color: rgba(255, 255, 0, 0.7);
-        box-shadow: 0 0 0 2px rgba(255, 255, 0, 0.3);
-      }
-    `;
-  });
+      attempts++;
+    }
+    
+    // If we couldn't find a non-overlapping position, use grid fallback
+    if (!placed) {
+      const cols = Math.floor(containerWidth / fruitWrapperWidth);
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      positions.push({
+        x: padding + col * fruitWrapperWidth + fruitWrapperWidth / 2 - 35,
+        y: padding + row * fruitWrapperHeight + fruitWrapperHeight / 2 - 40
+      });
+    }
+  }
   
-  style.textContent = css;
-  document.head.appendChild(style);
+  return { type: 'random', positions };
 }
 
 function render() {
@@ -114,17 +147,17 @@ function render() {
 }
 
 function renderFeelingsScreen() {
-  // Generate CSS for fruit emojis on first render
-  if (!document.querySelector('style[data-fruit-css]')) {
-    generateFruitCSS();
-  }
-  
   const feelingsFruitsHtml = FEELINGS.map((f, index) => {
     const selected = state.feelings.has(f);
-    const fruitEmoji = FRUIT_EMOJIS[index % FRUIT_EMOJIS.length];
+    const fruitClass = FRUIT_CLASSES[index % FRUIT_CLASSES.length];
+    
+    // Use data attributes for positioning - actual positions set by JS
     return `
-      <div class="fruit-container ${selected ? 'selected' : ''}" data-feeling="${f}">
-        <div class="fruit-emoji">${fruitEmoji}</div>
+      <div class="fruit-wrapper ${selected ? 'selected' : ''}" 
+           data-feeling="${f}" 
+           data-fruit-class="${fruitClass}"
+           style="left: 0; top: 0;">
+        <div class="fruit ${fruitClass}"></div>
         <div class="fruit-label">${f}</div>
       </div>
     `;
@@ -136,18 +169,65 @@ function renderFeelingsScreen() {
         <h1>How did this experience feel?</h1>
         <p class="subtitle">Select all that apply</p>
       </header>
-      <div class="fruit-grid">${feelingsFruitsHtml}</div>
+      <div class="feelings-area" id="feelings-area">
+        ${feelingsFruitsHtml}
+      </div>
       <footer>
         <button class="btn-primary" id="btn-next" ${state.feelings.size === 0 ? 'disabled' : ''}>Next →</button>
       </footer>
     </div>
   `;
 
-  app.querySelectorAll('.fruit-container').forEach(container => {
-    container.addEventListener('click', () => {
-      const feeling = container.dataset.feeling;
-      state.feelings = toggle(state.feelings, feeling);
-      render();
+  // After DOM is rendered, calculate and apply positions
+  requestAnimationFrame(() => {
+    const area = document.getElementById('feelings-area');
+    if (!area) return;
+    
+    const rect = area.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    
+    // Determine device type
+    const isMobile = window.innerWidth < 600;
+    const isTablet = window.innerWidth >= 600 && window.innerWidth < 1024;
+    
+    const layout = calculateFruitPositions(width, height, isMobile, isTablet);
+    
+    const wrappers = area.querySelectorAll('.fruit-wrapper');
+    
+    if (layout.type === 'grid') {
+      // Mobile/tablet grid layout - responsive columns
+      const cols = isMobile ? 4 : (isTablet ? 5 : 6);
+      const cellWidth = width / cols;
+      const cellHeight = 90; // Approximate cell height
+      
+      wrappers.forEach((wrapper, i) => {
+        const col = i % cols;
+        const row = Math.floor(i / cols);
+        
+        const x = col * cellWidth + cellWidth / 2 - 35;
+        const y = row * cellHeight + cellHeight / 2 - 40;
+        
+        wrapper.style.left = `${Math.max(10, x)}px`;
+        wrapper.style.top = `${Math.max(10, y)}px`;
+      });
+    } else {
+      // Random layout for larger screens
+      layout.positions.forEach((pos, i) => {
+        if (wrappers[i]) {
+          wrappers[i].style.left = `${pos.x}px`;
+          wrappers[i].style.top = `${pos.y}px`;
+        }
+      });
+    }
+    
+    // Add click handlers after positioning
+    wrappers.forEach(wrapper => {
+      wrapper.addEventListener('click', () => {
+        const feeling = wrapper.dataset.feeling;
+        state.feelings = toggle(state.feelings, feeling);
+        render();
+      });
     });
   });
 
@@ -266,6 +346,17 @@ function reset() {
   state.screen = SCREEN.FEELINGS;
   render();
 }
+
+// Handle window resize for responsive layout
+let resizeTimeout;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    if (state.screen === SCREEN.FEELINGS) {
+      render();
+    }
+  }, 250);
+});
 
 // ─── INIT ───────────────────────────────────────────────────────────────────
 render();
