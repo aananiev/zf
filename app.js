@@ -50,7 +50,7 @@ function render() {
 }
 
 function renderFeelingsScreen() {
-  const pillsHtml = FEELINGS.map(f => {
+  const feelingsPillsHtml = FEELINGS.map(f => {
     const selected = state.feelings.has(f);
     return `<button class="pill ${selected ? 'pill--selected' : ''}" data-feeling="${f}">${f}</button>`;
   }).join('');
@@ -61,14 +61,13 @@ function renderFeelingsScreen() {
         <h1>How did this experience feel?</h1>
         <p class="subtitle">Select all that apply</p>
       </header>
-      <div class="pill-grid">${pillsHtml}</div>
+      <div class="pill-grid">${feelingsPillsHtml}</div>
       <footer>
         <button class="btn-primary" id="btn-next" ${state.feelings.size === 0 ? 'disabled' : ''}>Next →</button>
       </footer>
     </div>
   `;
 
-  // Attach event listeners
   app.querySelectorAll('.pill').forEach(pill => {
     pill.addEventListener('click', () => {
       const feeling = pill.dataset.feeling;
@@ -84,7 +83,7 @@ function renderFeelingsScreen() {
 }
 
 function renderNeedsScreen() {
-  const chipsHtml = NEEDS.map(n => {
+  const needsChipsHtml = NEEDS.map(n => {
     const s = state.needStates[n];
     return `<button class="need-chip need-chip--${s || 'none'}" data-need="${n}">
       <span class="need-label">${n}</span>
@@ -99,7 +98,7 @@ function renderNeedsScreen() {
         <h1>Which needs were involved?</h1>
         <p class="subtitle">Tap once for met ✓ · twice for unmet ✗ · again to clear</p>
       </header>
-      <div class="needs-grid">${chipsHtml}</div>
+      <div class="needs-grid">${needsChipsHtml}</div>
       ${state.error ? `<p class="error-msg">${state.error}</p>` : ''}
       <footer>
         <button class="btn-ghost" id="btn-back" ${state.submitting ? 'disabled' : ''}>← Back</button>
@@ -110,7 +109,6 @@ function renderNeedsScreen() {
     </div>
   `;
 
-  // Attach event listeners
   app.querySelectorAll('.need-chip').forEach(chip => {
     chip.addEventListener('click', () => {
       const need = chip.dataset.need;
