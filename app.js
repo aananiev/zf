@@ -11,6 +11,40 @@ const FEELINGS = [
   "Disconnected","Irritated","Exhausted","Numb","Embarrassed","Angry","Scared","Disappointed",
 ];
 
+// CSS fruit class names - each maps to a unique fruit shape
+const FRUIT_CLASSES = [
+  "fruit-apple",      // Joyful
+  "fruit-banana",     // Grateful
+  "fruit-strawberry", // Inspired
+  "fruit-orange",     // Excited
+  "fruit-grapes",     // Peaceful
+  "fruit-cherry",     // Curious
+  "fruit-pineapple",  // Connected
+  "fruit-kiwi",       // Proud
+  "fruit-mango",      // Relieved
+  "fruit-pear",       // Hopeful
+  "fruit-peach",      // Amused
+  "fruit-watermelon", // Content
+  "fruit-lemon",      // Energised
+  "fruit-coconut",    // Moved
+  "fruit-blueberry",  // Safe
+  "fruit-raspberry",  // Anxious
+  "fruit-avocado",    // Overwhelmed
+  "fruit-dragonfruit",// Confused
+  "fruit-pomegranate",// Frustrated
+  "fruit-fig",        // Sad
+  "fruit-papaya",     // Lonely
+  "fruit-passionfruit",// Bored
+  "fruit-cantaloupe", // Disconnected
+  "fruit-honeydew",   // Irritated
+  "fruit-starfruit",  // Exhausted
+  "fruit-persimmon",  // Numb
+  "fruit-plum",       // Embarrassed
+  "fruit-apricot",    // Angry
+  "fruit-nectarine",  // Scared
+  "fruit-cranberry",  // Disappointed
+];
+
 const NEEDS = [
   "Belonging","Autonomy","Safety","Recognition","Rest","Clarity",
   "Connection","Meaning","Play","Fairness","Support","Learning",
@@ -26,8 +60,14 @@ let state = {
   feelings: new Set(),
   needStates: {},
   submitting: false,
-  error: null
+  error: null,
+  fruitPositions: null, // Will store { type, positions } - computed once
+  containerSize: null   // Store container dimensions for position calculation
 };
+
+// Fixed item size for collision detection
+const ITEM_WIDTH = 80;
+const ITEM_HEIGHT = 90;
 
 // ─── DOM ───────────────────────────────────────────────────────────────────
 const app = document.getElementById("app");
@@ -37,6 +77,78 @@ function toggle(set, item) {
   const next = new Set(set);
   next.has(item) ? next.delete(item) : next.add(item);
   return next;
+}
+
+// Calculate positions using a reliable grid approach with bounds checking
+function calculateFruitPositions(containerWidth, containerHeight, isMobile, isTablet) {
+  const padding = 15; // Space from container edges
+  
+  // On mobile: use responsive grid with dynamic column calculation
+  if (isMobile || containerWidth < 500) {
+    return { type: 'grid', positions: null };
+  }
+  
+  // Available space inside padding
+  const availableWidth = containerWidth - padding * 2;
+  const availableHeight = containerHeight - padding * 2;
+  
+  // Calculate optimal grid dimensions
+  const fruitCount = FEELINGS.length;
+  
+  // Find the best grid that fits all items
+  let bestCols = Math.ceil(Math.sqrt(fruitCount)); // Start with square-ish
+  let bestScore = 0;
+  
+  // Try different column counts to find the best fit
+  for (let cols = 3; cols <= Math.min(8, fruitCount); cols++) {
+    const rows = Math.ceil(fruitCount / cols);
+    const cellWidth = availableWidth / cols;
+    const cellHeight = availableHeight / rows;
+    
+    // Check if items fit in this grid
+    if (cellWidth >= ITEM_WIDTH && cellHeight >= ITEM_HEIGHT) {
+      // Score based on how well we use space (prefer using more space)
+      const widthUtilization = (cols * ITEM_WIDTH) / availableWidth;
+      const heightUtilization = (rows * ITEM_HEIGHT) / availableHeight;
+      const score = widthUtilization * heightUtilization;
+      
+      if (score > bestScore) {
+        bestScore = score;
+        bestCols = cols;
+      }
+    }
+  }
+  
+  // Ensure we have a valid column count
+  const cols = Math.max(3, Math.min(bestCols, 8));
+  const rows = Math.ceil(fruitCount / cols);
+  
+  // Calculate cell dimensions - ensure items fit with minimum padding
+  const cellWidth = Math.max(ITEM_WIDTH, availableWidth / cols);
+  const cellHeight = Math.max(ITEM_HEIGHT, availableHeight / rows);
+  
+  // Generate positions using grid with bounds checking
+  const positions = [];
+  
+  for (let i = 0; i < fruitCount; i++) {
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    
+    // Base position from grid
+    const baseX = padding + col * cellWidth + (cellWidth - ITEM_WIDTH) / 2;
+    const baseY = padding + row * cellHeight + (cellHeight - ITEM_HEIGHT) / 2;
+    
+    // Ensure we stay within bounds
+    const maxX = containerWidth - padding - ITEM_WIDTH;
+    const maxY = containerHeight - padding - ITEM_HEIGHT;
+    
+    positions.push({
+      x: Math.max(padding, Math.min(maxX, baseX)),
+      y: Math.max(padding, Math.min(maxY, baseY))
+    });
+  }
+  
+  return { type: 'random', positions };
 }
 
 function render() {
@@ -50,9 +162,18 @@ function render() {
 }
 
 function renderFeelingsScreen() {
-  const feelingsPillsHtml = FEELINGS.map(f => {
+  const feelingsFruitsHtml = FEELINGS.map((f, index) => {
     const selected = state.feelings.has(f);
-    return `<button class="pill ${selected ? 'pill--selected' : ''}" data-feeling="${f}">${f}</button>`;
+    const fruitClass = FRUIT_CLASSES[index % FRUIT_CLASSES.length];
+    
+    return `
+      <div class="fruit-wrapper ${selected ? 'selected' : ''}" 
+           data-feeling="${f}" 
+           data-fruit-class="${fruitClass}">
+        <div class="fruit ${fruitClass}"></div>
+        <div class="fruit-label">${f}</div>
+      </div>
+    `;
   }).join('');
 
   app.innerHTML = `
@@ -61,19 +182,100 @@ function renderFeelingsScreen() {
         <h1>How did this experience feel?</h1>
         <p class="subtitle">Select all that apply</p>
       </header>
-      <div class="pill-grid">${feelingsPillsHtml}</div>
+      <div class="feelings-area" id="feelings-area">
+        ${feelingsFruitsHtml}
+      </div>
       <footer>
         <button class="btn-primary" id="btn-next" ${state.feelings.size === 0 ? 'disabled' : ''}>Next →</button>
       </footer>
     </div>
   `;
 
-  app.querySelectorAll('.pill').forEach(pill => {
-    pill.addEventListener('click', () => {
-      const feeling = pill.dataset.feeling;
-      state.feelings = toggle(state.feelings, feeling);
-      render();
-    });
+  // Calculate and apply positions after DOM is rendered
+  requestAnimationFrame(() => {
+    const area = document.getElementById('feelings-area');
+    if (!area) return;
+    
+    const rect = area.getBoundingClientRect();
+    let width = rect.width;
+    let height = rect.height;
+    
+    // Handle edge case where we get zero dimensions
+    if (width === 0 || height === 0) {
+      // Try to get dimensions from window innerWidth/innerHeight as fallback
+      width = window.innerWidth;
+      height = window.innerHeight - 200; // Approximate space for header/footer
+      
+      // Ensure minimum dimensions
+      width = Math.max(width, 320);
+      height = Math.max(height, 400);
+    }
+    
+    // Determine device type
+    const isMobile = window.innerWidth < 600;
+    const isTablet = window.innerWidth >= 600 && window.innerWidth < 1024;
+    
+    // Only calculate positions if container size changed or not yet calculated
+    const needsRecalculation = !state.fruitPositions || 
+                              !state.containerSize ||
+                              state.containerSize.width !== width ||
+                              state.containerSize.height !== height ||
+                              state.containerSize.isMobile !== isMobile;
+    
+    if (needsRecalculation) {
+      state.fruitPositions = calculateFruitPositions(width, height, isMobile, isTablet);
+      state.containerSize = { width, height, isMobile };
+    }
+    
+    const wrappers = area.querySelectorAll('.fruit-wrapper');
+    
+    if (state.fruitPositions.type === 'grid') {
+      // Mobile/tablet grid layout with fixed item size
+      const cols = isMobile ? 4 : (isTablet ? 5 : 6);
+      const cellWidth = width / cols;
+      const cellHeight = 100; // Fixed height for rows
+      
+      wrappers.forEach((wrapper, i) => {
+        const col = i % cols;
+        const row = Math.floor(i / cols);
+        
+        // Center item in cell with bounds checking
+        let x = col * cellWidth + (cellWidth - ITEM_WIDTH) / 2;
+        let y = row * cellHeight + (cellHeight - ITEM_HEIGHT) / 2;
+        
+        // Ensure we stay within bounds
+        const maxX = width - 15 - ITEM_WIDTH; // padding * 2 - 15 for safety
+        const maxY = height - 15 - ITEM_HEIGHT;
+        
+        x = Math.max(15, Math.min(maxX, x));
+        y = Math.max(15, Math.min(maxY, y));
+        
+        wrapper.style.left = `${x}px`;
+        wrapper.style.top = `${y}px`;
+      });
+    } else {
+      // Random layout - use stored positions
+      state.fruitPositions.positions.forEach((pos, i) => {
+        if (wrappers[i]) {
+          wrappers[i].style.left = `${pos.x}px`;
+          wrappers[i].style.top = `${pos.y}px`;
+        }
+      });
+    }
+    
+    // Add click handlers (only once)
+    const existingHandler = area.getAttribute('data-handlers-attached');
+    if (!existingHandler) {
+      area.setAttribute('data-handlers-attached', 'true');
+      
+      wrappers.forEach(wrapper => {
+        wrapper.addEventListener('click', () => {
+          const feeling = wrapper.dataset.feeling;
+          state.feelings = toggle(state.feelings, feeling);
+          render();
+        });
+      });
+    }
   });
 
   app.querySelector('#btn-next').addEventListener('click', () => {
@@ -189,8 +391,26 @@ function reset() {
   state.needStates = {};
   state.error = null;
   state.screen = SCREEN.FEELINGS;
+  // Keep fruit positions and container size for consistent layout
   render();
 }
+
+// Handle window resize - only recalculate if moving between mobile/desktop
+let resizeTimeout;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    const isMobile = window.innerWidth < 600;
+    const wasMobile = state.containerSize?.isMobile;
+    
+    // Only clear positions if switching between mobile and desktop
+    if (state.screen === SCREEN.FEELINGS && wasMobile !== isMobile) {
+      state.fruitPositions = null;
+      state.containerSize = null;
+      render();
+    }
+  }, 250);
+});
 
 // ─── INIT ───────────────────────────────────────────────────────────────────
 render();
