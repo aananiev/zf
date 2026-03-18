@@ -61,7 +61,8 @@ let state = {
   needStates: {},
   submitting: false,
   error: null,
-  fruitPositions: [] // Store computed positions for random layout
+  fruitPositions: null, // Will store { type, positions } - computed once
+  containerSize: null  // Store container dimensions for position calculation
 };
 
 // ─── DOM ───────────────────────────────────────────────────────────────────
@@ -75,65 +76,111 @@ function toggle(set, item) {
 }
 
 // Calculate random non-overlapping positions for fruits
+// Uses spiral/packed placement with jitter for better distribution
 function calculateFruitPositions(containerWidth, containerHeight, isMobile, isTablet) {
-  const padding = 20; // Space from container edges
-  const fruitWrapperWidth = 75; // Approximate width + margin
-  const fruitWrapperHeight = 85; // Approximate height + margin
+  const padding = 25;
+  const fruitWidth = 75;
+  const fruitHeight = 85;
   
-  // On mobile: use a nice responsive grid
+  // On mobile: use a responsive grid
   if (isMobile || containerWidth < 500) {
     return { type: 'grid', positions: null };
   }
   
-  // On tablet and desktop: use random positions with collision detection
-  const positions = [];
-  const maxAttempts = 500; // Max attempts to find non-overlapping position
-  const minDistance = 65; // Minimum distance between fruit centers
+  // Available space
+  const availableWidth = containerWidth - padding * 2;
+  const availableHeight = containerHeight - padding * 2;
   
-  // Generate random positions with collision detection
-  for (let i = 0; i < FEELINGS.length; i++) {
-    let placed = false;
-    let attempts = 0;
+  // Calculate grid dimensions based on fruit count and container size
+  const fruitCount = FEELINGS.length;
+  const cols = Math.max(4, Math.floor(availableWidth / fruitWidth));
+  const rows = Math.ceil(fruitCount / cols);
+  
+  // Calculate cell size
+  const cellWidth = availableWidth / cols;
+  const cellHeight = Math.min(fruitHeight * 1.3, availableHeight / Math.max(rows, 3));
+  
+  // Generate positions using grid with random offset (jitter)
+  const positions = [];
+  const jitterRange = Math.min(15, cellWidth * 0.15);
+  
+  for (let i = 0; i < fruitCount; i++) {
+    const col = i % cols;
+    const row = Math.floor(i / cols);
     
-    while (!placed && attempts < maxAttempts) {
-      // Generate random position within container bounds
-      const x = padding + Math.random() * (containerWidth - fruitWrapperWidth - padding * 2);
-      const y = padding + Math.random() * (containerHeight - fruitWrapperHeight - padding * 2);
-      
-      // Check for overlap with existing fruits
-      let overlaps = false;
-      for (const pos of positions) {
-        const dx = x - pos.x;
-        const dy = y - pos.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        if (distance < minDistance) {
-          overlaps = true;
-          break;
-        }
-      }
-      
-      if (!overlaps) {
-        positions.push({ x, y });
-        placed = true;
-      }
-      
-      attempts++;
-    }
+    // Base position from grid
+    const baseX = padding + col * cellWidth + cellWidth / 2 - fruitWidth / 2;
+    const baseY = padding + row * cellHeight + cellHeight / 2 - fruitHeight / 2;
     
-    // If we couldn't find a non-overlapping position, use grid fallback
-    if (!placed) {
-      const cols = Math.floor(containerWidth / fruitWrapperWidth);
-      const col = i % cols;
-      const row = Math.floor(i / cols);
-      positions.push({
-        x: padding + col * fruitWrapperWidth + fruitWrapperWidth / 2 - 35,
-        y: padding + row * fruitWrapperHeight + fruitWrapperHeight / 2 - 40
-      });
-    }
+    // Add random jitter within cell bounds
+    const jitterX = (Math.random() - 0.5) * jitterRange * 2;
+    const jitterY = (Math.random() - 0.5) * jitterRange * 2;
+    
+    // Clamp to container bounds
+    const x = Math.max(padding, Math.min(containerWidth - fruitWidth - padding, baseX + jitterX));
+    const y = Math.max(padding, Math.min(containerHeight - fruitHeight - padding, baseY + jitterY));
+    
+    positions.push({ x, y });
   }
   
+  // Apply collision resolution pass
+  const minDistance = Math.min(fruitWidth, fruitHeight) * 0.9;
+  resolveCollisions(positions, minDistance, containerWidth, containerHeight, padding, fruitWidth, fruitHeight);
+  
   return { type: 'random', positions };
+}
+
+// Resolve any remaining overlaps using iterative separation
+function resolveCollisions(positions, minDistance, containerWidth, containerHeight, padding, fruitWidth, fruitHeight) {
+  const maxIterations = 50;
+  
+  for (let iter = 0; iter < maxIterations; iter++) {
+    let hasCollision = false;
+    
+    for (let i = 0; i < positions.length; i++) {
+      for (let j = i + 1; j < positions.length; j++) {
+        const p1 = positions[i];
+        const p2 = positions[j];
+        
+        // Center points
+        const c1x = p1.x + fruitWidth / 2;
+        const c1y = p1.y + fruitHeight / 2;
+        const c2x = p2.x + fruitWidth / 2;
+        const c2y = p2.y + fruitHeight / 2;
+        
+        // Distance between centers
+        const dx = c2x - c1x;
+        const dy = c2y - c1y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if (dist < minDistance && dist > 0) {
+          hasCollision = true;
+          
+          // Push apart based on overlap
+          const overlap = minDistance - dist;
+          const nx = dx / dist;
+          const ny = dy / dist;
+          
+          // Move each fruit half the overlap distance
+          const moveX = nx * overlap * 0.5;
+          const moveY = ny * overlap * 0.5;
+          
+          p1.x -= moveX;
+          p1.y -= moveY;
+          p2.x += moveX;
+          p2.y += moveY;
+          
+          // Clamp to bounds
+          p1.x = Math.max(padding, Math.min(containerWidth - fruitWidth - padding, p1.x));
+          p1.y = Math.max(padding, Math.min(containerHeight - fruitHeight - padding, p1.y));
+          p2.x = Math.max(padding, Math.min(containerWidth - fruitWidth - padding, p2.x));
+          p2.y = Math.max(padding, Math.min(containerHeight - fruitHeight - padding, p2.y));
+        }
+      }
+    }
+    
+    if (!hasCollision) break;
+  }
 }
 
 function render() {
@@ -151,12 +198,10 @@ function renderFeelingsScreen() {
     const selected = state.feelings.has(f);
     const fruitClass = FRUIT_CLASSES[index % FRUIT_CLASSES.length];
     
-    // Use data attributes for positioning - actual positions set by JS
     return `
       <div class="fruit-wrapper ${selected ? 'selected' : ''}" 
            data-feeling="${f}" 
-           data-fruit-class="${fruitClass}"
-           style="left: 0; top: 0;">
+           data-fruit-class="${fruitClass}">
         <div class="fruit ${fruitClass}"></div>
         <div class="fruit-label">${f}</div>
       </div>
@@ -178,7 +223,7 @@ function renderFeelingsScreen() {
     </div>
   `;
 
-  // After DOM is rendered, calculate and apply positions
+  // Calculate and apply positions after DOM is rendered
   requestAnimationFrame(() => {
     const area = document.getElementById('feelings-area');
     if (!area) return;
@@ -191,15 +236,25 @@ function renderFeelingsScreen() {
     const isMobile = window.innerWidth < 600;
     const isTablet = window.innerWidth >= 600 && window.innerWidth < 1024;
     
-    const layout = calculateFruitPositions(width, height, isMobile, isTablet);
+    // Only calculate positions if container size changed or not yet calculated
+    const needsRecalculation = !state.fruitPositions || 
+                              !state.containerSize ||
+                              state.containerSize.width !== width ||
+                              state.containerSize.height !== height ||
+                              state.containerSize.isMobile !== isMobile;
+    
+    if (needsRecalculation) {
+      state.fruitPositions = calculateFruitPositions(width, height, isMobile, isTablet);
+      state.containerSize = { width, height, isMobile };
+    }
     
     const wrappers = area.querySelectorAll('.fruit-wrapper');
     
-    if (layout.type === 'grid') {
-      // Mobile/tablet grid layout - responsive columns
+    if (state.fruitPositions.type === 'grid') {
+      // Mobile/tablet grid layout
       const cols = isMobile ? 4 : (isTablet ? 5 : 6);
       const cellWidth = width / cols;
-      const cellHeight = 90; // Approximate cell height
+      const cellHeight = 90;
       
       wrappers.forEach((wrapper, i) => {
         const col = i % cols;
@@ -212,8 +267,8 @@ function renderFeelingsScreen() {
         wrapper.style.top = `${Math.max(10, y)}px`;
       });
     } else {
-      // Random layout for larger screens
-      layout.positions.forEach((pos, i) => {
+      // Random layout - use stored positions
+      state.fruitPositions.positions.forEach((pos, i) => {
         if (wrappers[i]) {
           wrappers[i].style.left = `${pos.x}px`;
           wrappers[i].style.top = `${pos.y}px`;
@@ -221,14 +276,19 @@ function renderFeelingsScreen() {
       });
     }
     
-    // Add click handlers after positioning
-    wrappers.forEach(wrapper => {
-      wrapper.addEventListener('click', () => {
-        const feeling = wrapper.dataset.feeling;
-        state.feelings = toggle(state.feelings, feeling);
-        render();
+    // Add click handlers (only once, not on re-renders)
+    const existingHandler = area.getAttribute('data-handlers-attached');
+    if (!existingHandler) {
+      area.setAttribute('data-handlers-attached', 'true');
+      
+      wrappers.forEach(wrapper => {
+        wrapper.addEventListener('click', () => {
+          const feeling = wrapper.dataset.feeling;
+          state.feelings = toggle(state.feelings, feeling);
+          render();
+        });
       });
-    });
+    }
   });
 
   app.querySelector('#btn-next').addEventListener('click', () => {
@@ -344,15 +404,22 @@ function reset() {
   state.needStates = {};
   state.error = null;
   state.screen = SCREEN.FEELINGS;
+  // Keep fruit positions and container size for consistent layout
   render();
 }
 
-// Handle window resize for responsive layout
+// Handle window resize - only recalculate if moving between mobile/desktop
 let resizeTimeout;
 window.addEventListener('resize', () => {
   clearTimeout(resizeTimeout);
   resizeTimeout = setTimeout(() => {
-    if (state.screen === SCREEN.FEELINGS) {
+    const isMobile = window.innerWidth < 600;
+    const wasMobile = state.containerSize?.isMobile;
+    
+    // Only clear positions if switching between mobile and desktop
+    if (state.screen === SCREEN.FEELINGS && wasMobile !== isMobile) {
+      state.fruitPositions = null;
+      state.containerSize = null;
       render();
     }
   }, 250);
