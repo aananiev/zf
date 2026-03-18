@@ -106,6 +106,8 @@
 /* ── Layout ──────────────────────────────────────────────────── */
 html, body {
   height: 100%;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
 }
 
@@ -114,30 +116,34 @@ body {
   color: var(--text);
   font-family: var(--font);
   width: 100%;
+  height: 100vh;
+  overflow: hidden;
 }
 
 /* ── App container ───────────────────────────────────────────── */
 .app {
   width: 100%;
-  height: 100dvh;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  padding: 10px; /* Add padding to prevent edge clipping */
+  box-sizing: border-box;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* ── Screen container ────────────────────────────────────────── */
 .screen {
   width: 100%;
   max-width: 680px;
-  height: 100%;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
   padding: 1rem;
   box-sizing: border-box;
   position: relative;
+  overflow: visible;
 }
 
 @media (min-width: 600px) {
@@ -186,6 +192,8 @@ h1 {
   background: linear-gradient(145deg, rgba(26, 26, 31, 0.6) 0%, rgba(15, 15, 17, 0.8) 100%);
   border: 1px solid var(--border);
   margin-bottom: 0.5rem; /* Reduced space for buttons */
+  /* Ensure we can calculate height properly */
+  min-height: 200px; /* Minimum height to ensure space for items */
 }
 
 /* Needs grid - unchanged */
@@ -339,5 +347,18 @@ footer {
   .fruit-label {
     width: 60px;
     font-size: 0.6rem;
+  }
+}
+
+/* Ensure feelings area can grow as needed */
+.feelings-area {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* Fix for iPhone/Safari viewport issues */
+@supports (-webkit-touch-callout: none) {
+  .app {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
 }

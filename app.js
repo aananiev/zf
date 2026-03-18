@@ -79,11 +79,11 @@ function toggle(set, item) {
   return next;
 }
 
-// Calculate positions using improved grid with spacing utilization
+// Calculate positions using a more reliable grid approach
 function calculateFruitPositions(containerWidth, containerHeight, isMobile, isTablet) {
   const padding = 15; // Space from container edges
   
-  // On mobile: use responsive grid with better spacing
+  // On mobile: use responsive grid
   if (isMobile || containerWidth < 500) {
     return { type: 'grid', positions: null };
   }
@@ -95,39 +95,38 @@ function calculateFruitPositions(containerWidth, containerHeight, isMobile, isTa
   // Calculate optimal grid dimensions
   const fruitCount = FEELINGS.length;
   
-  // Try different column counts to best utilize space
-  let bestCols = 4;
-  let bestUtilization = 0;
+  // Find the best grid that fits all items with some spacing
+  let bestCols = Math.ceil(Math.sqrt(fruitCount)); // Start with square-ish
+  let bestRows = Math.ceil(fruitCount / bestCols);
   
-  // Test column counts from 3 to 8
-  for (let cols = 3; cols <= 8; cols++) {
-    const rows = Math.ceil(fruitCount / cols);
-    const cellWidth = availableWidth / cols;
-    const cellHeight = availableHeight / rows;
+  // Try to optimize for available space
+  while (bestCols > 1) {
+    const testRows = Math.ceil(fruitCount / (bestCols - 1));
+    const testCellWidth = availableWidth / (bestCols - 1);
+    const testCellHeight = availableHeight / testRows;
     
-    // Check if items fit
-    if (cellWidth >= ITEM_WIDTH && cellHeight >= ITEM_HEIGHT) {
-      // Calculate utilization (how much space we use)
-      const utilization = (fruitCount * ITEM_WIDTH * ITEM_HEIGHT) / 
-                         (availableWidth * availableHeight);
-      if (utilization > bestUtilization) {
-        bestUtilization = utilization;
-        bestCols = cols;
-      }
+    if (testCellWidth >= ITEM_WIDTH && testCellHeight >= ITEM_HEIGHT) {
+      bestCols--;
+      bestRows = testRows;
+    } else {
+      break;
     }
   }
   
+  // Ensure we don't exceed reasonable limits
+  bestCols = Math.min(bestCols, 8);
+  bestCols = Math.max(bestCols, 3);
   const cols = bestCols;
   const rows = Math.ceil(fruitCount / cols);
   
-  // Calculate cell dimensions
-  const cellWidth = availableWidth / cols;
-  const cellHeight = availableHeight / rows;
+  // Calculate cell dimensions - ensure items fit
+  const cellWidth = Math.max(ITEM_WIDTH, availableWidth / cols);
+  const cellHeight = Math.max(ITEM_HEIGHT, availableHeight / rows);
   
-  // Generate positions using grid with jitter within safe bounds
+  // Generate positions using grid with small jitter to avoid perfect alignment
   const positions = [];
-  const maxJitterX = Math.max(0, (cellWidth - ITEM_WIDTH) / 2);
-  const maxJitterY = Math.max(0, (cellHeight - ITEM_HEIGHT) / 2);
+  const maxJitterX = Math.min(10, (cellWidth - ITEM_WIDTH) / 2);
+  const maxJitterY = Math.min(10, (cellHeight - ITEM_HEIGHT) / 2);
   
   for (let i = 0; i < fruitCount; i++) {
     const col = i % cols;
@@ -137,14 +136,21 @@ function calculateFruitPositions(containerWidth, containerHeight, isMobile, isTa
     const baseX = padding + col * cellWidth + (cellWidth - ITEM_WIDTH) / 2;
     const baseY = padding + row * cellHeight + (cellHeight - ITEM_HEIGHT) / 2;
     
-    // Add random jitter within safe bounds (ensuring no overlap)
-    const jitterX = (Math.random() - 0.5) * maxJitterX * 0.8; // 80% of max to be safe
-    const jitterY = (Math.random() - 0.5) * maxJitterY * 0.8;
+    // Add small random jitter
+    const jitterX = (Math.random() - 0.5) * maxJitterX * 0.6;
+    const jitterY = (Math.random() - 0.5) * maxJitterY * 0.6;
     
     const x = baseX + jitterX;
     const y = baseY + jitterY;
     
-    positions.push({ x, y });
+    // Ensure we stay within bounds with some margin
+    const maxX = containerWidth - padding - ITEM_WIDTH;
+    const maxY = containerHeight - padding - ITEM_HEIGHT;
+    
+    positions.push({
+      x: Math.max(padding, Math.min(maxX, x)),
+      y: Math.max(padding, Math.min(maxY, y))
+    });
   }
   
   return { type: 'random', positions };
