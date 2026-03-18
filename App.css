@@ -84,6 +84,987 @@
 
 /* All the fruit definitions remain the same - only the container styling changed above */
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   FRUIT SHAPES - Pure CSS Fruits
+   Each fruit is a CSS class drawn with gradients, border-radius, box-shadows
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* 1. Apple - Joyful */
+.fruit-apple {
+  background: radial-gradient(circle at 35% 35%, #ff6b6b 0%, #e63946 40%, #c1121f 100%);
+  border-radius: 50% 45% 50% 45%;
+  box-shadow: 
+    inset -4px -4px 8px rgba(0,0,0,0.3),
+    inset 3px 3px 6px rgba(255,255,255,0.2),
+    2px 4px 8px rgba(0,0,0,0.3);
+}
+.fruit-apple::before {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 12px;
+  background: linear-gradient(to bottom, #5d4037, #3e2723);
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+.fruit-apple::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 10px;
+  background: #4caf50;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-15deg);
+  border-radius: 50% 50% 20% 20%;
+  clip-path: polygon(0% 50%, 30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%);
+}
+
+/* 2. Banana - Grateful */
+.fruit-banana {
+  width: 55px;
+  height: 55px;
+  background: linear-gradient(135deg, #ffe066 0%, #ffd93d 50%, #ffc107 100%);
+  border-radius: 50% 50% 45% 45% / 60% 60% 40% 40%;
+  box-shadow: 
+    inset -3px -3px 6px rgba(0,0,0,0.15),
+    inset 2px 2px 4px rgba(255,255,255,0.3),
+    2px 3px 6px rgba(0,0,0,0.2);
+  transform: rotate(10deg);
+}
+.fruit-banana::before {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #5d4037;
+  border-radius: 50%;
+  top: 2px;
+  left: 8px;
+}
+.fruit-banana::after {
+  content: '';
+  position: absolute;
+  width: 30px;
+  height: 4px;
+  background: linear-gradient(to right, #8b4513, #654321);
+  top: 45px;
+  left: 15px;
+  border-radius: 2px;
+  transform: rotate(10deg);
+}
+
+/* 3. Strawberry - Inspired */
+.fruit-strawberry {
+  background: radial-gradient(ellipse at 50% 40%, #ff6b6b 0%, #e63946 60%, #c1121f 100%);
+  border-radius: 50% 50% 45% 45% / 60% 60% 40% 40%;
+  box-shadow: 
+    inset -3px -3px 6px rgba(0,0,0,0.25),
+    inset 2px 2px 4px rgba(255,255,255,0.15),
+    2px 4px 6px rgba(0,0,0,0.3);
+}
+.fruit-strawberry::before {
+  content: '';
+  position: absolute;
+  width: 40px;
+  height: 20px;
+  top: -8px;
+  left: 10px;
+  background: 
+    radial-gradient(circle at 8px 12px, #4caf50 4px, transparent 4px),
+    radial-gradient(circle at 20px 8px, #4caf50 4px, transparent 4px),
+    radial-gradient(circle at 32px 12px, #4caf50 4px, transparent 4px),
+    linear-gradient(to bottom, #66bb6a, #4caf50);
+  border-radius: 50% 50% 0 0;
+}
+.fruit-strawberry::after {
+  content: '';
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  top: 8px;
+  left: 15px;
+  background-image: 
+    radial-gradient(circle, #ffeb3b 2px, transparent 2px),
+    radial-gradient(circle, #ffeb3b 2px, transparent 2px),
+    radial-gradient(circle, #ffeb3b 2px, transparent 2px),
+    radial-gradient(circle, #ffeb3b 2px, transparent 2px);
+  background-size: 8px 8px;
+  background-position: 2px 2px, 14px 2px, 6px 12px, 18px 12px;
+}
+
+/* 4. Orange - Excited */
+.fruit-orange {
+  background: radial-gradient(circle at 35% 35%, #ffa726 0%, #ff9800 50%, #f57c00 100%);
+  border-radius: 50%;
+  box-shadow: 
+    inset -4px -4px 8px rgba(0,0,0,0.2),
+    inset 3px 3px 6px rgba(255,255,255,0.25),
+    2px 4px 8px rgba(0,0,0,0.3);
+}
+.fruit-orange::before {
+  content: '';
+  position: absolute;
+  width: 3px;
+  height: 8px;
+  background: linear-gradient(to bottom, #4caf50, #388e3c);
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px 2px 0 0;
+}
+.fruit-orange::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 6px;
+  background: #66bb6a;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-20deg);
+  border-radius: 50% 50% 20% 20%;
+}
+
+/* 5. Grapes - Peaceful */
+.fruit-grapes {
+  background: 
+    radial-gradient(circle at 15px 15px, #9c27b0 8px, transparent 8px),
+    radial-gradient(circle at 35px 15px, #ab47bc 8px, transparent 8px),
+    radial-gradient(circle at 50px 15px, #9c27b0 8px, transparent 8px),
+    radial-gradient(circle at 15px 32px, #ba68c8 8px, transparent 8px),
+    radial-gradient(circle at 35px 32px, #ab47bc 8px, transparent 8px),
+    radial-gradient(circle at 15px 48px, #ce93d8 8px, transparent 8px);
+  width: 60px;
+  height: 55px;
+  box-shadow: 2px 4px 6px rgba(0,0,0,0.3);
+}
+.fruit-grapes::before {
+  content: '';
+  position: absolute;
+  width: 3px;
+  height: 15px;
+  background: linear-gradient(to bottom, #5d4037, #4caf50);
+  top: -12px;
+  left: 30px;
+  border-radius: 2px;
+}
+.fruit-grapes::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 10px;
+  background: #66bb6a;
+  top: -15px;
+  left: 22px;
+  border-radius: 50% 50% 30% 30%;
+  transform: rotate(-10deg);
+}
+
+/* 6. Cherry - Curious */
+.fruit-cherry {
+  background: 
+    radial-gradient(circle at 18px 25px, #d32f2f 10px, transparent 10px),
+    radial-gradient(circle at 42px 25px, #c62828 10px, transparent 10px);
+  width: 60px;
+  height: 50px;
+  box-shadow: 2px 4px 6px rgba(0,0,0,0.3);
+}
+.fruit-cherry::before {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 25px;
+  background: linear-gradient(to right, #5d4037 40%, #8d6e63 60%);
+  top: -20px;
+  left: 18px;
+  border-radius: 2px;
+  transform: rotate(15deg);
+}
+.fruit-cherry::after {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 25px;
+  background: linear-gradient(to right, #5d4037 40%, #8d6e63 60%);
+  top: -20px;
+  left: 42px;
+  border-radius: 2px;
+  transform: rotate(-15deg);
+}
+
+/* 7. Pineapple - Connected */
+.fruit-pineapple {
+  background: linear-gradient(135deg, #ffc107 0%, #ffa000 50%, #ff8f00 100%);
+  border-radius: 50% 50% 45% 45% / 40% 40% 60% 60%;
+  box-shadow: 
+    inset -3px -3px 6px rgba(0,0,0,0.2),
+    inset 2px 2px 4px rgba(255,255,255,0.2),
+    2px 4px 6px rgba(0,0,0,0.3);
+}
+.fruit-pineapple::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 4px,
+    rgba(0,0,0,0.1) 4px,
+    rgba(0,0,0,0.1) 5px
+  );
+  border-radius: inherit;
+}
+.fruit-pineapple::after {
+  content: '';
+  position: absolute;
+  width: 25px;
+  height: 18px;
+  background: linear-gradient(to bottom, #4caf50, #388e3c);
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 30% 30% 50% 50%;
+  clip-path: polygon(10% 100%, 0% 60%, 20% 30%, 40% 0%, 60% 30%, 80% 60%, 90% 100%);
+}
+
+/* 8. Kiwi - Proud */
+.fruit-kiwi {
+  background: radial-gradient(ellipse at 40% 40%, #8bc34a 0%, #689f38 50%, #558b2f 100%);
+  border-radius: 50%;
+  box-shadow: 
+    inset -3px -3px 6px rgba(0,0,0,0.25),
+    inset 2px 2px 4px rgba(255,255,255,0.15),
+    2px 4px 6px rgba(0,0,0,0.3);
+}
+.fruit-kiwi::before {
+  content: '';
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border: 2px solid rgba(0,0,0,0.15);
+  border-radius: 50%;
+  top: 10px;
+  left: 10px;
+  background: transparent;
+}
+.fruit-kiwi::after {
+  content: '';
+  position: absolute;
+  width: 3px;
+  height: 6px;
+  background: #5d4037;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+
+/* 9. Mango - Relieved */
+.fruit-mango {
+  background: radial-gradient(ellipse at 40% 40%, #ff9800 0%, #f57c00 50%, #e65100 100%);
+  border-radius: 45% 50% 45% 45% / 50% 50% 40% 45%;
+  box-shadow: 
+    inset -4px -4px 8px rgba(0,0,0,0.2),
+    inset 3px 3px 6px rgba(255,255,255,0.15),
+    2px 4px 8px rgba(0,0,0,0.3);
+}
+.fruit-mango::before {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 10px;
+  background: linear-gradient(to bottom, #5d4037, #4caf50);
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+.fruit-mango::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 8px;
+  background: #66bb6a;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-10deg);
+  border-radius: 50% 50% 20% 20%;
+}
+
+/* 10. Pear - Hopeful */
+.fruit-pear {
+  background: radial-gradient(ellipse at 40% 35%, #cddc39 0%, #afb42b 50%, #827717 100%);
+  border-radius: 40% 45% 45% 50% / 50% 55% 45% 50%;
+  box-shadow: 
+    inset -3px -3px 6px rgba(0,0,0,0.2),
+    inset 2px 2px 4px rgba(255,255,255,0.2),
+    2px 4px 6px rgba(0,0,0,0.3);
+}
+.fruit-pear::before {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 12px;
+  background: linear-gradient(to bottom, #5d4037, #3e2723);
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+.fruit-pear::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 8px;
+  background: #4caf50;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-5deg);
+  border-radius: 50% 50% 20% 20%;
+}
+
+/* 11. Peach - Amused */
+.fruit-peach {
+  background: radial-gradient(circle at 40% 40%, #ffccbc 0%, #ffab91 50%, #ff8a65 100%);
+  border-radius: 50% 50% 45% 45% / 55% 55% 45% 45%;
+  box-shadow: 
+    inset -3px -3px 6px rgba(0,0,0,0.15),
+    inset 2px 2px 4px rgba(255,255,255,0.3),
+    2px 4px 6px rgba(0,0,0,0.25);
+}
+.fruit-peach::before {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 10px;
+  background: linear-gradient(to bottom, #795548, #5d4037);
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+.fruit-peach::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 7px;
+  background: #8bc34a;
+  top: -9px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-10deg);
+  border-radius: 50% 50% 20% 20%;
+}
+
+/* 12. Watermelon - Content */
+.fruit-watermelon {
+  background: radial-gradient(circle at 50% 50%, #4caf50 0%, #388e3c 50%, #2e7d32 100%);
+  border-radius: 50%;
+  box-shadow: 
+    inset -3px -3px 6px rgba(0,0,0,0.25),
+    inset 2px 2px 4px rgba(255,255,255,0.15),
+    2px 4px 6px rgba(0,0,0,0.3);
+}
+.fruit-watermelon::before {
+  content: '';
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  background: radial-gradient(circle at 50% 50%, #ff6b6b 0%, #e53935 40%, #c62828 100%);
+  border-radius: 50%;
+  top: 8px;
+  left: 8px;
+}
+.fruit-watermelon::after {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 6px;
+  background: #5d4037;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+
+/* 13. Lemon - Energised */
+.fruit-lemon {
+  background: radial-gradient(ellipse at 40% 40%, #fff59d 0%, #ffee58 50%, #fdd835 100%);
+  border-radius: 50% 50% 45% 45% / 55% 55% 45% 45%;
+  box-shadow: 
+    inset -3px -3px 6px rgba(0,0,0,0.1),
+    inset 2px 2px 4px rgba(255,255,255,0.4),
+    2px 4px 6px rgba(0,0,0,0.2);
+}
+.fruit-lemon::before {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 8px;
+  background: linear-gradient(to bottom, #5d4037, #4caf50);
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+.fruit-lemon::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 6px;
+  background: #66bb6a;
+  top: -7px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-20deg);
+  border-radius: 50% 50% 20% 20%;
+}
+
+/* 14. Coconut - Moved */
+.fruit-coconut {
+  background: radial-gradient(circle at 40% 40%, #8d6e63 0%, #6d4c41 50%, #5d4037 100%);
+  border-radius: 50%;
+  box-shadow: 
+    inset -4px -4px 8px rgba(0,0,0,0.3),
+    inset 3px 3px 6px rgba(255,255,255,0.1),
+    2px 4px 8px rgba(0,0,0,0.35);
+}
+.fruit-coconut::before {
+  content: '';
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background: radial-gradient(circle at 50% 50%, #d7ccc8 0%, #bcaaa4 100%);
+  border-radius: 50%;
+  top: 15px;
+  left: 15px;
+  box-shadow: inset -2px -2px 4px rgba(0,0,0,0.15);
+}
+.fruit-coconut::after {
+  content: '';
+  position: absolute;
+  width: 3px;
+  height: 6px;
+  background: #4caf50;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+
+/* 15. Blueberry - Safe */
+.fruit-blueberry {
+  background: radial-gradient(circle at 35% 35%, #7986cb 0%, #5c6bc0 40%, #3949ab 100%);
+  border-radius: 50%;
+  box-shadow: 
+    inset -3px -3px 6px rgba(0,0,0,0.3),
+    inset 2px 2px 4px rgba(255,255,255,0.2),
+    2px 4px 8px rgba(0,0,0,0.35);
+}
+.fruit-blueberry::before {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 3px;
+  background: #303f9f;
+  top: 2px;
+  left: 27px;
+  border-radius: 2px;
+}
+.fruit-blueberry::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 5px;
+  border: 2px solid #303f9f;
+  border-bottom: none;
+  border-radius: 5px 5px 0 0;
+  top: -2px;
+  left: 25px;
+}
+
+/* 16. Raspberry - Anxious */
+.fruit-raspberry {
+  background: 
+    radial-gradient(circle at 12px 12px, #e91e63 5px, transparent 5px),
+    radial-gradient(circle at 24px 8px, #ec407a 5px, transparent 5px),
+    radial-gradient(circle at 36px 12px, #e91e63 5px, transparent 5px),
+    radial-gradient(circle at 48px 8px, #f06292 5px, transparent 5px),
+    radial-gradient(circle at 8px 24px, #f06292 5px, transparent 5px),
+    radial-gradient(circle at 20px 20px, #e91e63 5px, transparent 5px),
+    radial-gradient(circle at 32px 24px, #ec407a 5px, transparent 5px),
+    radial-gradient(circle at 44px 20px, #e91e63 5px, transparent 5px),
+    radial-gradient(circle at 12px 36px, #f48fb1 5px, transparent 5px),
+    radial-gradient(circle at 24px 32px, #f06292 5px, transparent 5px),
+    radial-gradient(circle at 36px 36px, #e91e63 5px, transparent 5px),
+    radial-gradient(circle at 28px 44px, #ec407a 5px, transparent 5px);
+  width: 55px;
+  height: 50px;
+  box-shadow: 2px 4px 6px rgba(0,0,0,0.3);
+}
+.fruit-raspberry::before {
+  content: '';
+  position: absolute;
+  width: 3px;
+  height: 12px;
+  background: linear-gradient(to bottom, #5d4037, #4caf50);
+  top: -10px;
+  left: 26px;
+  border-radius: 2px;
+}
+.fruit-raspberry::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 7px;
+  background: #66bb6a;
+  top: -12px;
+  left: 21px;
+  border-radius: 50% 50% 20% 20%;
+  transform: rotate(-5deg);
+}
+
+/* 17. Avocado - Overwhelmed */
+.fruit-avocado {
+  background: radial-gradient(ellipse at 40% 40%, #a5d6a7 0%, #81c784 50%, #66bb6a 100%);
+  border-radius: 50% 50% 45% 45% / 55% 55% 45% 45%;
+  box-shadow: 
+    inset -3px -3px 6px rgba(0,0,0,0.15),
+    inset 2px 2px 4px rgba(255,255,255,0.25),
+    2px 4px 6px rgba(0,0,0,0.25);
+}
+.fruit-avocado::before {
+  content: '';
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  background: radial-gradient(ellipse at 50% 50%, #ffeb3b 0%, #fdd835 50%, #f9a825 100%);
+  border-radius: 50%;
+  top: 19px;
+  left: 19px;
+}
+.fruit-avocado::after {
+  content: '';
+  position: absolute;
+  width: 3px;
+  height: 5px;
+  background: #5d4037;
+  top: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+
+/* 18. Dragonfruit - Confused */
+.fruit-dragonfruit {
+  background: radial-gradient(circle at 50% 50%, #f8bbd9 0%, #f48fb1 50%, #ec407a 100%);
+  border-radius: 50%;
+  box-shadow: 
+    inset -3px -3px 6px rgba(0,0,0,0.15),
+    inset 2px 2px 4px rgba(255,255,255,0.25),
+    2px 4px 6px rgba(0,0,0,0.25);
+}
+.fruit-dragonfruit::before {
+  content: '';
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  border: 3px dotted #4caf50;
+  border-radius: 50%;
+  top: 5px;
+  left: 5px;
+  opacity: 0.7;
+}
+.fruit-dragonfruit::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 20px;
+  background: linear-gradient(to bottom, #4caf50, #388e3c);
+  top: -18px;
+  left: 26px;
+  border-radius: 3px;
+}
+
+/* 19. Pomegranate - Frustrated */
+.fruit-pomegranate {
+  background: radial-gradient(circle at 40% 40%, #ef5350 0%, #e53935 50%, #c62828 100%);
+  border-radius: 45% 45% 50% 50% / 50% 50% 50% 50%;
+  box-shadow: 
+    inset -4px -4px 8px rgba(0,0,0,0.25),
+    inset 3px 3px 6px rgba(255,255,255,0.15),
+    2px 4px 8px rgba(0,0,0,0.35);
+}
+.fruit-pomegranate::before {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 10px;
+  background: linear-gradient(to bottom, #795548, #5d4037);
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+.fruit-pomegranate::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 8px;
+  background: #8bc34a;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 50% 50% 20% 20%;
+}
+
+/* 20. Fig - Sad */
+.fruit-fig {
+  background: radial-gradient(ellipse at 40% 40%, #8d6e63 0%, #6d4c41 50%, #5d4037 100%);
+  border-radius: 40% 45% 45% 45% / 45% 50% 45% 45%;
+  box-shadow: 
+    inset -3px -3px 6px rgba(0,0,0,0.3),
+    inset 2px 2px 4px rgba(255,255,255,0.1),
+    2px 4px 6px rgba(0,0,0,0.35);
+}
+.fruit-fig::before {
+  content: '';
+  position: absolute;
+  width: 3px;
+  height: 8px;
+  background: linear-gradient(to bottom, #5d4037, #4caf50);
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+.fruit-fig::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 5px;
+  background: #66bb6a;
+  top: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+}
+
+/* 21. Papaya - Lonely */
+.fruit-papaya {
+  background: radial-gradient(ellipse at 40% 40%, #ffcc80 0%, #ffb74d 50%, #ffa726 100%);
+  border-radius: 50% 50% 45% 45% / 55% 55% 45% 45%;
+  box-shadow: 
+    inset -3px -3px 6px rgba(0,0,0,0.15),
+    inset 2px 2px 4px rgba(255,255,255,0.25),
+    2px 4px 6px rgba(0,0,0,0.25);
+}
+.fruit-papaya::before {
+  content: '';
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background: radial-gradient(circle at 50% 50%, #263238 0%, #37474f 100%);
+  border-radius: 50%;
+  top: 15px;
+  left: 15px;
+}
+.fruit-papaya::after {
+  content: '';
+  position: absolute;
+  width: 3px;
+  height: 6px;
+  background: #5d4037;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+
+/* 22. Passionfruit - Bored */
+.fruit-passionfruit {
+  background: radial-gradient(circle at 40% 40%, #ffeb3b 0%, #fdd835 50%, #f9a825 100%);
+  border-radius: 50%;
+  box-shadow: 
+    inset -3px -3px 6px rgba(0,0,0,0.15),
+    inset 2px 2px 4px rgba(255,255,255,0.3),
+    2px 4px 6px rgba(0,0,0,0.25);
+}
+.fruit-passionfruit::before {
+  content: '';
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  border: 2px solid rgba(0,0,0,0.1);
+  border-radius: 50%;
+  top: 5px;
+  left: 5px;
+}
+.fruit-passionfruit::after {
+  content: '';
+  position: absolute;
+  width: 3px;
+  height: 8px;
+  background: linear-gradient(to bottom, #5d4037, #4caf50);
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+
+/* 23. Cantaloupe - Disconnected */
+.fruit-cantaloupe {
+  background: radial-gradient(circle at 40% 40%, #ffe0b2 0%, #ffcc80 50%, #ffb74d 100%);
+  border-radius: 50%;
+  box-shadow: 
+    inset -3px -3px 6px rgba(0,0,0,0.12),
+    inset 2px 2px 4px rgba(255,255,255,0.3),
+    2px 4px 6px rgba(0,0,0,0.22);
+}
+.fruit-cantaloupe::before {
+  content: '';
+  position: absolute;
+  width: 46px;
+  height: 46px;
+  border: 2px dashed rgba(0,0,0,0.08);
+  border-radius: 50%;
+  top: 7px;
+  left: 7px;
+}
+.fruit-cantaloupe::after {
+  content: '';
+  position: absolute;
+  width: 3px;
+  height: 6px;
+  background: #5d4037;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+
+/* 24. Honeydew - Irritated */
+.fruit-honeydew {
+  background: radial-gradient(circle at 40% 40%, #f0f4c3 0%, #e6ee9c 50%, #dce775 100%);
+  border-radius: 50%;
+  box-shadow: 
+    inset -3px -3px 6px rgba(0,0,0,0.1),
+    inset 2px 2px 4px rgba(255,255,255,0.35),
+    2px 4px 6px rgba(0,0,0,0.2);
+}
+.fruit-honeydew::before {
+  content: '';
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border: 2px solid rgba(0,0,0,0.06);
+  border-radius: 50%;
+  top: 10px;
+  left: 10px;
+}
+.fruit-honeydew::after {
+  content: '';
+  position: absolute;
+  width: 3px;
+  height: 6px;
+  background: #5d4037;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+
+/* 25. Starfruit - Exhausted */
+.fruit-starfruit {
+  background: radial-gradient(ellipse at 50% 50%, #c5e1a5 0%, #aed581 50%, #9ccc65 100%);
+  width: 55px;
+  height: 55px;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  box-shadow: 2px 4px 6px rgba(0,0,0,0.25);
+}
+.fruit-starfruit::before {
+  content: '';
+  position: absolute;
+  width: 3px;
+  height: 8px;
+  background: linear-gradient(to bottom, #5d4037, #4caf50);
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+.fruit-starfruit::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 5px;
+  background: #66bb6a;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+}
+
+/* 26. Persimmon - Numb */
+.fruit-persimmon {
+  background: radial-gradient(circle at 40% 40%, #ff8a65 0%, #ff7043 50%, #f4511e 100%);
+  border-radius: 50%;
+  box-shadow: 
+    inset -3px -3px 6px rgba(0,0,0,0.2),
+    inset 2px 2px 4px rgba(255,255,255,0.2),
+    2px 4px 6px rgba(0,0,0,0.3);
+}
+.fruit-persimmon::before {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 10px;
+  background: linear-gradient(to bottom, #5d4037, #3e2723);
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+.fruit-persimmon::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 7px;
+  background: #4caf50;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 50% 50% 20% 20%;
+}
+
+/* 27. Plum - Embarrassed */
+.fruit-plum {
+  background: radial-gradient(circle at 40% 40%, #ab47bc 0%, #9c27b0 50%, #7b1fa2 100%);
+  border-radius: 50%;
+  box-shadow: 
+    inset -3px -3px 6px rgba(0,0,0,0.25),
+    inset 2px 2px 4px rgba(255,255,255,0.2),
+    2px 4px 8px rgba(0,0,0,0.35);
+}
+.fruit-plum::before {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 9px;
+  background: linear-gradient(to bottom, #5d4037, #3e2723);
+  top: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+.fruit-plum::after {
+  content: '';
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: rgba(255,255,255,0.3);
+  top: 12px;
+  left: 20px;
+  border-radius: 50%;
+  box-shadow: 15px 5px 0 rgba(255,255,255,0.3);
+}
+
+/* 28. Apricot - Angry */
+.fruit-apricot {
+  background: radial-gradient(circle at 40% 40%, #ffcc80 0%, #ffb74d 50%, #ff9800 100%);
+  border-radius: 50%;
+  box-shadow: 
+    inset -3px -3px 6px rgba(0,0,0,0.15),
+    inset 2px 2px 4px rgba(255,255,255,0.25),
+    2px 4px 6px rgba(0,0,0,0.25);
+}
+.fruit-apricot::before {
+  content: '';
+  position: absolute;
+  width: 3px;
+  height: 8px;
+  background: linear-gradient(to bottom, #5d4037, #3e2723);
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+.fruit-apricot::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 6px;
+  background: #66bb6a;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 50% 50% 20% 20%;
+}
+
+/* 29. Nectarine - Scared */
+.fruit-nectarine {
+  background: radial-gradient(circle at 40% 40%, #ff8a65 0%, #ff7043 50%, #ff5722 100%);
+  border-radius: 50%;
+  box-shadow: 
+    inset -3px -3px 6px rgba(0,0,0,0.18),
+    inset 2px 2px 4px rgba(255,255,255,0.22),
+    2px 4px 6px rgba(0,0,0,0.28);
+}
+.fruit-nectarine::before {
+  content: '';
+  position: absolute;
+  width: 3px;
+  height: 8px;
+  background: linear-gradient(to bottom, #5d4037, #3e2723);
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+.fruit-nectarine::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 6px;
+  background: #4caf50;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 50% 50% 20% 20%;
+}
+
+/* 30. Cranberry - Disappointed */
+.fruit-cranberry {
+  background: radial-gradient(circle at 35% 35%, #c62828 0%, #b71c1c 50%, #880e4f 100%);
+  border-radius: 50%;
+  box-shadow: 
+    inset -3px -3px 6px rgba(0,0,0,0.3),
+    inset 2px 2px 4px rgba(255,255,255,0.15),
+    2px 4px 8px rgba(0,0,0,0.35);
+}
+.fruit-cranberry::before {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 3px;
+  background: #3e2723;
+  top: 2px;
+  left: 27px;
+  border-radius: 2px;
+}
+.fruit-cranberry::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 5px;
+  border: 2px solid #3e2723;
+  border-bottom: none;
+  border-radius: 5px 5px 0 0;
+  top: -2px;
+  left: 25px;
+}
+
 /* ── Reset & base ────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
