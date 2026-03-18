@@ -62,8 +62,12 @@ let state = {
   submitting: false,
   error: null,
   fruitPositions: null, // Will store { type, positions } - computed once
-  containerSize: null  // Store container dimensions for position calculation
+  containerSize: null   // Store container dimensions for position calculation
 };
+
+// Fixed item size for collision detection
+const ITEM_WIDTH = 80;
+const ITEM_HEIGHT = 90;
 
 // ─── DOM ───────────────────────────────────────────────────────────────────
 const app = document.getElementById("app");
@@ -75,112 +79,75 @@ function toggle(set, item) {
   return next;
 }
 
-// Calculate random non-overlapping positions for fruits
-// Uses spiral/packed placement with jitter for better distribution
+// Calculate positions using improved grid with spacing utilization
 function calculateFruitPositions(containerWidth, containerHeight, isMobile, isTablet) {
-  const padding = 25;
-  const fruitWidth = 75;
-  const fruitHeight = 85;
+  const padding = 15; // Space from container edges
   
-  // On mobile: use a responsive grid
+  // On mobile: use responsive grid with better spacing
   if (isMobile || containerWidth < 500) {
     return { type: 'grid', positions: null };
   }
   
-  // Available space
+  // Available space inside padding
   const availableWidth = containerWidth - padding * 2;
   const availableHeight = containerHeight - padding * 2;
   
-  // Calculate grid dimensions based on fruit count and container size
+  // Calculate optimal grid dimensions
   const fruitCount = FEELINGS.length;
-  const cols = Math.max(4, Math.floor(availableWidth / fruitWidth));
+  
+  // Try different column counts to best utilize space
+  let bestCols = 4;
+  let bestUtilization = 0;
+  
+  // Test column counts from 3 to 8
+  for (let cols = 3; cols <= 8; cols++) {
+    const rows = Math.ceil(fruitCount / cols);
+    const cellWidth = availableWidth / cols;
+    const cellHeight = availableHeight / rows;
+    
+    // Check if items fit
+    if (cellWidth >= ITEM_WIDTH && cellHeight >= ITEM_HEIGHT) {
+      // Calculate utilization (how much space we use)
+      const utilization = (fruitCount * ITEM_WIDTH * ITEM_HEIGHT) / 
+                         (availableWidth * availableHeight);
+      if (utilization > bestUtilization) {
+        bestUtilization = utilization;
+        bestCols = cols;
+      }
+    }
+  }
+  
+  const cols = bestCols;
   const rows = Math.ceil(fruitCount / cols);
   
-  // Calculate cell size
+  // Calculate cell dimensions
   const cellWidth = availableWidth / cols;
-  const cellHeight = Math.min(fruitHeight * 1.3, availableHeight / Math.max(rows, 3));
+  const cellHeight = availableHeight / rows;
   
-  // Generate positions using grid with random offset (jitter)
+  // Generate positions using grid with jitter within safe bounds
   const positions = [];
-  const jitterRange = Math.min(15, cellWidth * 0.15);
+  const maxJitterX = Math.max(0, (cellWidth - ITEM_WIDTH) / 2);
+  const maxJitterY = Math.max(0, (cellHeight - ITEM_HEIGHT) / 2);
   
   for (let i = 0; i < fruitCount; i++) {
     const col = i % cols;
     const row = Math.floor(i / cols);
     
     // Base position from grid
-    const baseX = padding + col * cellWidth + cellWidth / 2 - fruitWidth / 2;
-    const baseY = padding + row * cellHeight + cellHeight / 2 - fruitHeight / 2;
+    const baseX = padding + col * cellWidth + (cellWidth - ITEM_WIDTH) / 2;
+    const baseY = padding + row * cellHeight + (cellHeight - ITEM_HEIGHT) / 2;
     
-    // Add random jitter within cell bounds
-    const jitterX = (Math.random() - 0.5) * jitterRange * 2;
-    const jitterY = (Math.random() - 0.5) * jitterRange * 2;
+    // Add random jitter within safe bounds (ensuring no overlap)
+    const jitterX = (Math.random() - 0.5) * maxJitterX * 0.8; // 80% of max to be safe
+    const jitterY = (Math.random() - 0.5) * maxJitterY * 0.8;
     
-    // Clamp to container bounds
-    const x = Math.max(padding, Math.min(containerWidth - fruitWidth - padding, baseX + jitterX));
-    const y = Math.max(padding, Math.min(containerHeight - fruitHeight - padding, baseY + jitterY));
+    const x = baseX + jitterX;
+    const y = baseY + jitterY;
     
     positions.push({ x, y });
   }
   
-  // Apply collision resolution pass
-  const minDistance = Math.min(fruitWidth, fruitHeight) * 0.9;
-  resolveCollisions(positions, minDistance, containerWidth, containerHeight, padding, fruitWidth, fruitHeight);
-  
   return { type: 'random', positions };
-}
-
-// Resolve any remaining overlaps using iterative separation
-function resolveCollisions(positions, minDistance, containerWidth, containerHeight, padding, fruitWidth, fruitHeight) {
-  const maxIterations = 50;
-  
-  for (let iter = 0; iter < maxIterations; iter++) {
-    let hasCollision = false;
-    
-    for (let i = 0; i < positions.length; i++) {
-      for (let j = i + 1; j < positions.length; j++) {
-        const p1 = positions[i];
-        const p2 = positions[j];
-        
-        // Center points
-        const c1x = p1.x + fruitWidth / 2;
-        const c1y = p1.y + fruitHeight / 2;
-        const c2x = p2.x + fruitWidth / 2;
-        const c2y = p2.y + fruitHeight / 2;
-        
-        // Distance between centers
-        const dx = c2x - c1x;
-        const dy = c2y - c1y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        
-        if (dist < minDistance && dist > 0) {
-          hasCollision = true;
-          
-          // Push apart based on overlap
-          const overlap = minDistance - dist;
-          const nx = dx / dist;
-          const ny = dy / dist;
-          
-          // Move each fruit half the overlap distance
-          const moveX = nx * overlap * 0.5;
-          const moveY = ny * overlap * 0.5;
-          
-          p1.x -= moveX;
-          p1.y -= moveY;
-          p2.x += moveX;
-          p2.y += moveY;
-          
-          // Clamp to bounds
-          p1.x = Math.max(padding, Math.min(containerWidth - fruitWidth - padding, p1.x));
-          p1.y = Math.max(padding, Math.min(containerHeight - fruitHeight - padding, p1.y));
-          p2.x = Math.max(padding, Math.min(containerWidth - fruitWidth - padding, p2.x));
-          p2.y = Math.max(padding, Math.min(containerHeight - fruitHeight - padding, p2.y));
-        }
-      }
-    }
-    
-    if (!hasCollision) break;
-  }
 }
 
 function render() {
@@ -251,20 +218,21 @@ function renderFeelingsScreen() {
     const wrappers = area.querySelectorAll('.fruit-wrapper');
     
     if (state.fruitPositions.type === 'grid') {
-      // Mobile/tablet grid layout
+      // Mobile/tablet grid layout with fixed item size
       const cols = isMobile ? 4 : (isTablet ? 5 : 6);
       const cellWidth = width / cols;
-      const cellHeight = 90;
+      const cellHeight = 100; // Fixed height for rows
       
       wrappers.forEach((wrapper, i) => {
         const col = i % cols;
         const row = Math.floor(i / cols);
         
-        const x = col * cellWidth + cellWidth / 2 - 35;
-        const y = row * cellHeight + cellHeight / 2 - 40;
+        // Center item in cell
+        const x = col * cellWidth + (cellWidth - ITEM_WIDTH) / 2;
+        const y = row * cellHeight + (cellHeight - ITEM_HEIGHT) / 2;
         
-        wrapper.style.left = `${Math.max(10, x)}px`;
-        wrapper.style.top = `${Math.max(10, y)}px`;
+        wrapper.style.left = `${x}px`;
+        wrapper.style.top = `${y}px`;
       });
     } else {
       // Random layout - use stored positions
@@ -276,7 +244,7 @@ function renderFeelingsScreen() {
       });
     }
     
-    // Add click handlers (only once, not on re-renders)
+    // Add click handlers (only once)
     const existingHandler = area.getAttribute('data-handlers-attached');
     if (!existingHandler) {
       area.setAttribute('data-handlers-attached', 'true');
