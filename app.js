@@ -79,11 +79,11 @@ function toggle(set, item) {
   return next;
 }
 
-// Calculate positions using a more reliable grid approach
+// Calculate positions using a reliable grid approach with bounds checking
 function calculateFruitPositions(containerWidth, containerHeight, isMobile, isTablet) {
   const padding = 15; // Space from container edges
   
-  // On mobile: use responsive grid
+  // On mobile: use responsive grid with dynamic column calculation
   if (isMobile || containerWidth < 500) {
     return { type: 'grid', positions: null };
   }
@@ -95,38 +95,40 @@ function calculateFruitPositions(containerWidth, containerHeight, isMobile, isTa
   // Calculate optimal grid dimensions
   const fruitCount = FEELINGS.length;
   
-  // Find the best grid that fits all items with some spacing
+  // Find the best grid that fits all items
   let bestCols = Math.ceil(Math.sqrt(fruitCount)); // Start with square-ish
-  let bestRows = Math.ceil(fruitCount / bestCols);
+  let bestScore = 0;
   
-  // Try to optimize for available space
-  while (bestCols > 1) {
-    const testRows = Math.ceil(fruitCount / (bestCols - 1));
-    const testCellWidth = availableWidth / (bestCols - 1);
-    const testCellHeight = availableHeight / testRows;
+  // Try different column counts to find the best fit
+  for (let cols = 3; cols <= Math.min(8, fruitCount); cols++) {
+    const rows = Math.ceil(fruitCount / cols);
+    const cellWidth = availableWidth / cols;
+    const cellHeight = availableHeight / rows;
     
-    if (testCellWidth >= ITEM_WIDTH && testCellHeight >= ITEM_HEIGHT) {
-      bestCols--;
-      bestRows = testRows;
-    } else {
-      break;
+    // Check if items fit in this grid
+    if (cellWidth >= ITEM_WIDTH && cellHeight >= ITEM_HEIGHT) {
+      // Score based on how well we use space (prefer using more space)
+      const widthUtilization = (cols * ITEM_WIDTH) / availableWidth;
+      const heightUtilization = (rows * ITEM_HEIGHT) / availableHeight;
+      const score = widthUtilization * heightUtilization;
+      
+      if (score > bestScore) {
+        bestScore = score;
+        bestCols = cols;
+      }
     }
   }
   
-  // Ensure we don't exceed reasonable limits
-  bestCols = Math.min(bestCols, 8);
-  bestCols = Math.max(bestCols, 3);
-  const cols = bestCols;
+  // Ensure we have a valid column count
+  const cols = Math.max(3, Math.min(bestCols, 8));
   const rows = Math.ceil(fruitCount / cols);
   
-  // Calculate cell dimensions - ensure items fit
+  // Calculate cell dimensions - ensure items fit with minimum padding
   const cellWidth = Math.max(ITEM_WIDTH, availableWidth / cols);
   const cellHeight = Math.max(ITEM_HEIGHT, availableHeight / rows);
   
-  // Generate positions using grid with small jitter to avoid perfect alignment
+  // Generate positions using grid with bounds checking
   const positions = [];
-  const maxJitterX = Math.min(10, (cellWidth - ITEM_WIDTH) / 2);
-  const maxJitterY = Math.min(10, (cellHeight - ITEM_HEIGHT) / 2);
   
   for (let i = 0; i < fruitCount; i++) {
     const col = i % cols;
@@ -136,20 +138,13 @@ function calculateFruitPositions(containerWidth, containerHeight, isMobile, isTa
     const baseX = padding + col * cellWidth + (cellWidth - ITEM_WIDTH) / 2;
     const baseY = padding + row * cellHeight + (cellHeight - ITEM_HEIGHT) / 2;
     
-    // Add small random jitter
-    const jitterX = (Math.random() - 0.5) * maxJitterX * 0.6;
-    const jitterY = (Math.random() - 0.5) * maxJitterY * 0.6;
-    
-    const x = baseX + jitterX;
-    const y = baseY + jitterY;
-    
-    // Ensure we stay within bounds with some margin
+    // Ensure we stay within bounds
     const maxX = containerWidth - padding - ITEM_WIDTH;
     const maxY = containerHeight - padding - ITEM_HEIGHT;
     
     positions.push({
-      x: Math.max(padding, Math.min(maxX, x)),
-      y: Math.max(padding, Math.min(maxY, y))
+      x: Math.max(padding, Math.min(maxX, baseX)),
+      y: Math.max(padding, Math.min(maxY, baseY))
     });
   }
   
@@ -202,8 +197,19 @@ function renderFeelingsScreen() {
     if (!area) return;
     
     const rect = area.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
+    let width = rect.width;
+    let height = rect.height;
+    
+    // Handle edge case where we get zero dimensions
+    if (width === 0 || height === 0) {
+      // Try to get dimensions from window innerWidth/innerHeight as fallback
+      width = window.innerWidth;
+      height = window.innerHeight - 200; // Approximate space for header/footer
+      
+      // Ensure minimum dimensions
+      width = Math.max(width, 320);
+      height = Math.max(height, 400);
+    }
     
     // Determine device type
     const isMobile = window.innerWidth < 600;
@@ -233,9 +239,16 @@ function renderFeelingsScreen() {
         const col = i % cols;
         const row = Math.floor(i / cols);
         
-        // Center item in cell
-        const x = col * cellWidth + (cellWidth - ITEM_WIDTH) / 2;
-        const y = row * cellHeight + (cellHeight - ITEM_HEIGHT) / 2;
+        // Center item in cell with bounds checking
+        let x = col * cellWidth + (cellWidth - ITEM_WIDTH) / 2;
+        let y = row * cellHeight + (cellHeight - ITEM_HEIGHT) / 2;
+        
+        // Ensure we stay within bounds
+        const maxX = width - 15 - ITEM_WIDTH; // padding * 2 - 15 for safety
+        const maxY = height - 15 - ITEM_HEIGHT;
+        
+        x = Math.max(15, Math.min(maxX, x));
+        y = Math.max(15, Math.min(maxY, y));
         
         wrapper.style.left = `${x}px`;
         wrapper.style.top = `${y}px`;
